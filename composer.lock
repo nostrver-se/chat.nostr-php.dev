@@ -2306,16 +2306,16 @@
         },
         {
             "name": "nostriphant/blossom",
-            "version": "0.5.3",
+            "version": "0.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/blossom.git",
-                "reference": "f5228613069a5b0cee46fe111b8e9bad9b54fc42"
+                "reference": "22c881a1f412cc6cfa9a4675cfdfff394cc941bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/f5228613069a5b0cee46fe111b8e9bad9b54fc42",
-                "reference": "f5228613069a5b0cee46fe111b8e9bad9b54fc42",
+                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/22c881a1f412cc6cfa9a4675cfdfff394cc941bc",
+                "reference": "22c881a1f412cc6cfa9a4675cfdfff394cc941bc",
                 "shasum": ""
             },
             "require": {
@@ -2352,9 +2352,9 @@
             "homepage": "https://github.com/nostriphant/blossom",
             "support": {
                 "issues": "https://github.com/nostriphant/blossom/issues",
-                "source": "https://github.com/nostriphant/blossom/tree/0.5.3"
+                "source": "https://github.com/nostriphant/blossom/tree/0.5.4"
             },
-            "time": "2026-02-26T08:10:05+00:00"
+            "time": "2026-02-26T08:45:49+00:00"
         },
         {
             "name": "nostriphant/client",
