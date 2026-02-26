@@ -2306,16 +2306,16 @@
         },
         {
             "name": "nostriphant/blossom",
-            "version": "0.5.0",
+            "version": "0.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/blossom.git",
-                "reference": "481ebf54ebc787333cd5b0e32ea609e7acf0184b"
+                "reference": "4ff1f9bf1f75a72213f0fcc4894c6278d911b1b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/481ebf54ebc787333cd5b0e32ea609e7acf0184b",
-                "reference": "481ebf54ebc787333cd5b0e32ea609e7acf0184b",
+                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/4ff1f9bf1f75a72213f0fcc4894c6278d911b1b5",
+                "reference": "4ff1f9bf1f75a72213f0fcc4894c6278d911b1b5",
                 "shasum": ""
             },
             "require": {
@@ -2352,9 +2352,9 @@
             "homepage": "https://github.com/nostriphant/blossom",
             "support": {
                 "issues": "https://github.com/nostriphant/blossom/issues",
-                "source": "https://github.com/nostriphant/blossom/tree/0.5.0"
+                "source": "https://github.com/nostriphant/blossom/tree/0.5.2"
             },
-            "time": "2026-02-17T18:34:40+00:00"
+            "time": "2026-02-19T15:16:25+00:00"
         },
         {
             "name": "nostriphant/client",
@@ -2406,16 +2406,16 @@
         },
         {
             "name": "nostriphant/functional",
-            "version": "2.5.5",
+            "version": "2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/functional.git",
-                "reference": "c5ea3cd4624e9c6399fda29a1f5c2d071567ae1a"
+                "reference": "fb9e10afde2550cda545f49e493b1ebbd8d68256"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/functional/zipball/c5ea3cd4624e9c6399fda29a1f5c2d071567ae1a",
-                "reference": "c5ea3cd4624e9c6399fda29a1f5c2d071567ae1a",
+                "url": "https://api.github.com/repos/nostriphant/functional/zipball/fb9e10afde2550cda545f49e493b1ebbd8d68256",
+                "reference": "fb9e10afde2550cda545f49e493b1ebbd8d68256",
                 "shasum": ""
             },
             "require": {
@@ -2444,9 +2444,9 @@
             "description": "Functional helper classes for nostriphant projects",
             "support": {
                 "issues": "https://github.com/nostriphant/functional/issues",
-                "source": "https://github.com/nostriphant/functional/tree/2.5.5"
+                "source": "https://github.com/nostriphant/functional/tree/2.6.1"
             },
-            "time": "2026-02-11T10:23:47+00:00"
+            "time": "2026-02-24T07:32:27+00:00"
         },
         {
             "name": "nostriphant/nip-01",
@@ -2677,16 +2677,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "2.5.0",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "09d01986e64eae9ac859b687e5f3b702b96f2153"
+                "reference": "8ad048f59bad284dad8600fda661e84b6d8ba12c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/09d01986e64eae9ac859b687e5f3b702b96f2153",
-                "reference": "09d01986e64eae9ac859b687e5f3b702b96f2153",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/8ad048f59bad284dad8600fda661e84b6d8ba12c",
+                "reference": "8ad048f59bad284dad8600fda661e84b6d8ba12c",
                 "shasum": ""
             },
             "require": {
@@ -2734,9 +2734,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/2.5.0"
+                "source": "https://github.com/nostriphant/relay/tree/2.5.1"
             },
-            "time": "2026-02-11T10:15:23+00:00"
+            "time": "2026-02-26T07:38:36+00:00"
         },
         {
             "name": "nostriphant/stores",
@@ -7551,16 +7551,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.1.4",
+            "version": "2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "b39f1870fc7c3e9e4a26106df5053354b9260a33"
+                "reference": "79155f94852fa27e2f73b459f6503f5e87e2c188"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/b39f1870fc7c3e9e4a26106df5053354b9260a33",
-                "reference": "b39f1870fc7c3e9e4a26106df5053354b9260a33",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/79155f94852fa27e2f73b459f6503f5e87e2c188",
+                "reference": "79155f94852fa27e2f73b459f6503f5e87e2c188",
                 "shasum": ""
             },
             "require": {
@@ -7607,9 +7607,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.1.4"
+                "source": "https://github.com/webmozarts/assert/tree/2.1.5"
             },
-            "time": "2026-02-17T12:17:51+00:00"
+            "time": "2026-02-18T14:09:36+00:00"
         }
     ],
     "aliases": [],
