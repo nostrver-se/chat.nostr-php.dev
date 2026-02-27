@@ -10,10 +10,6 @@ use nostriphant\NIP01\Key;
 $data_dir = $_SERVER['RELAY_DATA'];
 is_dir($data_dir) || mkdir($data_dir);
 
-$files_dir = $data_dir . '/files';
-is_dir($files_dir) || mkdir($files_dir);
-
-
 $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument(
     name: $_SERVER['RELAY_NAME'],
     description: $_SERVER['RELAY_DESCRIPTION'],
@@ -24,9 +20,9 @@ $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument
     version: file_get_contents(__DIR__ . '/VERSION')
 ));
 
-$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, call_user_func(function() use ($files_dir) {
+$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, call_user_func(function() use ($data_dir) {
     
-    $blossom = \nostriphant\Blossom\Blossom::fromPath(Key::fromHex($_SERVER['BLOSSOM_SERVER_KEY']), $files_dir, new \nostriphant\Blossom\UploadConstraints(
+    $blossom = new \nostriphant\Blossom\Blossom(Key::fromHex($_SERVER['BLOSSOM_SERVER_KEY']), $data_dir, str_replace('wss://', 'https://', str_replace('ws://', 'http://', $_SERVER['RELAY_URL'])), new \nostriphant\Blossom\UploadConstraints(
         [(new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(), Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())],
         100 * 1024 ^ 2,
         []
@@ -36,15 +32,20 @@ $server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?
     foreach ($blossom as $route_factory) {
         yield function(callable $define) use ($route_factory) {
             
-            $redefine = fn($method, $endoint, $handler) => $define($method, $endoint, function(array $attributes, array $amp_headers) use ($handler) {
+            $redefine = fn($method, $endoint, $handler) => $define($method, $endoint, function(array $attributes, array $amp_headers, \Amp\Http\Server\RequestBody $body) use ($handler) {
                 
                 $headers = [];
                 foreach ($amp_headers as $header => $values) {
                     $headers['HTTP_' . strtoupper($header)] = join(', ', $values);
                 }
                 
+                $temp = tmpfile();
+                while (($chunk = $body->read()) !== null) {
+                    fwrite($temp, $chunk);
+                }
+                fseek($temp, 0);
                 
-                return $handler(new nostriphant\Blossom\HTTP\ServerRequest($headers, $attributes, fopen('php://input', 'rb')));
+                return $handler(new nostriphant\Blossom\HTTP\ServerRequest($headers, $attributes, $temp));
             });
 
             return $route_factory($redefine);
