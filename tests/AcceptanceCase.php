@@ -49,7 +49,21 @@ abstract class AcceptanceCase extends BaseTestCase
         
         sleep(4);
         
-        return fn() => $relay() || $agent;
+        $transpher = fn() => $relay() || $agent();
+        
+        
+        return new class($data_dir, AcceptanceCase::relay_url(port:$port), $transpher) {
+            
+            private \Closure $transpher;
+            
+            public function __construct(public string $data_directory, public string $url, callable $transpher) {
+                $this->transpher = \Closure::fromCallable($transpher);
+            }
+            
+            public function __invoke() {
+                call_user_func($this->transpher);
+            }
+        };
     }
     
     static public function unwrap(\nostriphant\NIP01\Key $recipient_key) {

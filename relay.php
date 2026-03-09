@@ -17,7 +17,7 @@ $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument
     contact: $_SERVER['RELAY_CONTACT'],
     supported_nips: [1, 2, 9, 11, 12, 13, 16, 20, 22, 33, 45],
     software: json_decode(file_get_contents(__DIR__ . '/composer.json'))->homepage,
-    version: file_get_contents(__DIR__ . '/VERSION')
+    version: trim(file_get_contents(__DIR__ . '/VERSION'))
 ));
 
 $server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, call_user_func(function() use ($data_dir) {

@@ -5,7 +5,7 @@ namespace {
     define('ROOT_DIR', __DIR__);
     is_dir(ROOT_DIR . '/logs') || mkdir(ROOT_DIR . '/logs');
 
-    define('TRANSPHER_VERSION', file_get_contents(__DIR__ . '/VERSION'));
+    define('TRANSPHER_VERSION', trim(file_get_contents(__DIR__ . '/VERSION')));
 
     $dotenv = Dotenv\Dotenv::createMutable(ROOT_DIR);
     $dotenv->safeLoad();
