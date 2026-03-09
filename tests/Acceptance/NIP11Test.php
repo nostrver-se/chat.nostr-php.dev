@@ -7,12 +7,11 @@ use nostriphant\NIP01\Key;
 
 it('boots a relay instance, which responds with an NIP-11 information document on a "GET /" request', function() {
     $recipient = Key::fromHex('6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc');
-
-    $data_dir = AcceptanceCase::data_dir('8088');
-
-    $transpher = AcceptanceCase::start_transpher('8088', $data_dir, $recipient, []);
     
-    list($protocol, $status, $headers, $body) = \nostriphant\Blossom\request('GET', AcceptanceCase::relay_url('http://', '8088') . '/', headers: ['Accept: application/nostr+json']);
+    $transpher = AcceptanceCase::start_transpher('8092', $recipient, []);
+    expect($transpher->url)->toStartWith('http://');
+    
+    list($protocol, $status, $headers, $body) = \nostriphant\Blossom\request('GET', $transpher->url . '/', headers: ['Accept: application/nostr+json']);
     expect($status)->toBe('200');
     //$body = $this->expectRelayResponse('/', 200, 'application/nostr+json', headers:['Accept: application/nostr+json']);
     expect($body)->toBe(json_encode([
@@ -24,6 +23,29 @@ it('boots a relay instance, which responds with an NIP-11 information document o
             'software' => "https://github.com/nostriphant/transpher",
             'version' => TRANSPHER_VERSION
     ]));
+    
+    $transpher();
+});
+
+it('reproduce nostria 504 error on information document request', function() {
+    $recipient = Key::fromHex('6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc');
+
+    $transpher = AcceptanceCase::start_transpher('8093', $recipient, []);
+    
+    list($protocol, $status, $headers, $body) = \nostriphant\Blossom\request('GET', $transpher->url, headers: [
+        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0',
+        'Accept: application/nostr+json',
+        'Accept-Language: nl,en;q=0.9,en-US;q=0.8',
+        'Accept-Encoding: gzip, deflate, br, zstd',
+        'Referer: https://nostria.app/',
+        'Origin: https://nostria.app',
+        'Sec-Fetch-Dest: empty',
+        'Sec-Fetch-Mode: cors',
+        'Sec-Fetch-Site: cross-site',
+        'Connection: keep-alive'
+    ]);
+    expect($status)->toBe('200');
+    
     
     $transpher();
 });

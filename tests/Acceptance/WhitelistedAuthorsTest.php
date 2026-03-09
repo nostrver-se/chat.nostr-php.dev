@@ -12,10 +12,8 @@ describe('only events from whitelisted authors/recipients are stored', function 
     it('only stores messages from owner and agent, but they are still being delivered', function (string $sender_hex, string $recipient_hex) {
         $sender = Key::fromHex($sender_hex);
         $recipient = Key::fromHex($recipient_hex);
-
-        $data_dir = AcceptanceCase::data_dir('8088');
         
-        $transpher = AcceptanceCase::start_transpher('8088', $data_dir, $recipient, []);
+        $transpher = AcceptanceCase::start_transpher('8088', $recipient, []);
 
         try {
             $alices_expected_messages = [];
@@ -64,10 +62,10 @@ describe('only events from whitelisted authors/recipients are stored', function 
 
             expect($bobs_expected_messages)->toHaveCount(1);
             
-            $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $data_dir, $alice_log));
-            $bob_listen(AcceptanceCase::createListener($unwrapper, $bobs_expected_messages, $data_dir, $bob_log));
+            $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $transpher->data_directory, $alice_log));
+            $bob_listen(AcceptanceCase::createListener($unwrapper, $bobs_expected_messages, $transpher->data_directory, $bob_log));
 
-            $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
+            $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
             $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
             expect($notes_alice[0]->kind)->toBe(1);
@@ -90,9 +88,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
         $sender = Key::fromHex($sender_hex);
         $recipient = Key::fromHex($recipient_hex);
         
-        $data_dir = AcceptanceCase::data_dir('8090');
-        
-        $transpher = AcceptanceCase::start_transpher('8090', $data_dir, $recipient, [(string) Bech32::npub($sender(Key::public()))]);
+        $transpher = AcceptanceCase::start_transpher('8090', $recipient, [(string) Bech32::npub($sender(Key::public()))]);
 
         try {
             $alices_expected_messages = [];
@@ -122,7 +118,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
                 $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
             });
 
-            $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $data_dir, $alice_log));
+            $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $transpher->data_directory, $alice_log));
 
 
             $bob_message = Factory::event($sender, 1, 'Hello!');
@@ -149,7 +145,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
             });
 
 
-            $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
+            $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
             $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
             expect($notes_alice[0]->kind)->toBe(1);

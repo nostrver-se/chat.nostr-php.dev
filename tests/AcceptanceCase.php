@@ -21,7 +21,9 @@ abstract class AcceptanceCase extends BaseTestCase
         return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
     }
     
-    static function start_transpher(string $port, string $data_dir, \nostriphant\NIP01\Key $owner, array $whitelisted_npubs) {
+    static function start_transpher(string $port, \nostriphant\NIP01\Key $owner, array $whitelisted_npubs) {
+        $data_dir = AcceptanceCase::data_dir($port);
+    
         (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
         expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
 
@@ -52,11 +54,11 @@ abstract class AcceptanceCase extends BaseTestCase
         $transpher = fn() => $relay() || $agent();
         
         
-        return new class($data_dir, AcceptanceCase::relay_url(port:$port), $transpher) {
+        return new class($data_dir, AcceptanceCase::relay_url('http://', $port), AcceptanceCase::relay_url(port:$port), $transpher) {
             
             private \Closure $transpher;
             
-            public function __construct(public string $data_directory, public string $url, callable $transpher) {
+            public function __construct(public string $data_directory, public string $url, public string $ws, callable $transpher) {
                 $this->transpher = \Closure::fromCallable($transpher);
             }
             

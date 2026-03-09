@@ -4,9 +4,8 @@ use nostriphant\TranspherTests\AcceptanceCase;
 
 $transpher;
 beforeAll(function() use (&$transpher) {
-    $data_dir = AcceptanceCase::data_dir('8091');
     $sender_key = nostriphant\NIP01\Key::fromHex('a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
-    $transpher = AcceptanceCase::start_transpher('8091', $data_dir, $sender_key, []);
+    $transpher = AcceptanceCase::start_transpher('8091', $sender_key, []);
 });
 
 describe('blossom', function() {
