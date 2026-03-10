@@ -9,25 +9,14 @@ use nostriphant\NIP19\Bech32;
 
 
 abstract class AcceptanceCase extends BaseTestCase
-{
-    static function bootAgent(int $port, array $env): Process {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port];
-        return new Process('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Listening to relay...'));
-    }
-
-    static function bootRelay(string $socket, array $env): Process {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $socket];
-        list($scheme, $uri) = explode(":", $socket, 2);
-        return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
-    }
-    
+{   
     static function start_transpher(string $port, \nostriphant\NIP01\Key $owner, array $whitelisted_npubs) {
         $data_dir = AcceptanceCase::data_dir($port);
     
         (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
         expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
 
-        $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://', $port), [
+        $relay = new Relay(AcceptanceCase::relay_url('tcp://', $port), [
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => AcceptanceCase::relay_url(port:$port),
             'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
@@ -42,7 +31,7 @@ abstract class AcceptanceCase extends BaseTestCase
             'BLOSSOM_SERVER_KEY' => 'ae89403ee4f95cac13c9984f588ad92cee48c202f52c6f96d4d5c053d8332c85',
         ]);
         
-        $agent = AcceptanceCase::bootAgent($port, [
+        $agent = new Agent($port, [
             'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => AcceptanceCase::relay_url(port: $port),
@@ -55,7 +44,6 @@ abstract class AcceptanceCase extends BaseTestCase
         
         
         return new class($data_dir, AcceptanceCase::relay_url('http://', $port), AcceptanceCase::relay_url(port:$port), $transpher) {
-            
             private \Closure $transpher;
             
             public function __construct(public string $data_directory, public string $url, public string $ws, callable $transpher) {

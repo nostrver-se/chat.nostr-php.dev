@@ -17,7 +17,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
     expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
     
-    $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://'), [
+    $relay = new nostriphant\TranspherTests\Relay(AcceptanceCase::relay_url('tcp://'), [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url(),
         'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
@@ -32,7 +32,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     
     expect($relay)->toBeCallable('Relay is not callable');
     
-    $agent = AcceptanceCase::bootAgent(8087, [
+    $agent = new nostriphant\TranspherTests\Agent(8087, [
         'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url(),
