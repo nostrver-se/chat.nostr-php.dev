@@ -2,7 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
-use nostriphant\TranspherTests\AcceptanceCase;
+use nostriphant\TranspherTests\Listener;
 use nostriphant\TranspherTests\Transpher;
 use nostriphant\TranspherTests\Factory;
 
@@ -25,8 +25,8 @@ describe('only events from whitelisted authors/recipients are stored', function 
             $bob_message = Factory::event($sender, 1, 'Hello!');
             $subscriptionAliceOnBobsMessage = Factory::subscribe(['ids' => [$bob_message()[1]['id']]]);
             
-            $alice_listener = AcceptanceCase::createListener('alice-8088', $recipient);
-            $bob_listener = AcceptanceCase::createListener('bob-8088', $sender);
+            $alice_listener = new Listener('alice-8088', $recipient);
+            $bob_listener = new Listener('bob-8088', $sender);
             $bob_listener->expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
             
             $bob_listen;
@@ -94,7 +94,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
             $bob = Client::connectToUrl($transpher->ws);
             
 
-            $alice_listener = AcceptanceCase::createListener('alice-8090', $recipient);
+            $alice_listener = new Listener('alice-8090', $recipient);
             $alice_listen = $alice(function(callable $send) use ($alice_listener, $recipient, $transpher) {
                 $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 

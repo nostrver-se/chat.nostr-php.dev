@@ -2,7 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
-use nostriphant\TranspherTests\AcceptanceCase;
+use nostriphant\TranspherTests\Listener;
 use nostriphant\TranspherTests\Transpher;
 use nostriphant\TranspherTests\Factory;
 
@@ -22,7 +22,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect($alice)->toBeCallable('Alice is not callable');
 
-        $alice_listener = AcceptanceCase::createListener('alice-8087', $recipient);
+        $alice_listener = new Listener('alice-8087', $recipient);
         $alice_listen = $alice(function(callable $send) use ($alice_listener, $recipient, $transpher) {
             $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 
