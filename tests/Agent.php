@@ -8,7 +8,7 @@ readonly class Agent {
     
     public function __construct(public string $port, public array $env) {
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port];
-        $this->process = new Feature\Process('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Listening to relay...'));
+        $this->process = new Feature\Process('agent-' . $port, $cmd, $env, \nostriphant\Functional\Partial::right('str_contains', 'Listening to relay...'));
     }
     
     public function __invoke(): mixed {
