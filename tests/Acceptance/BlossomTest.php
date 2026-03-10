@@ -8,11 +8,11 @@ beforeAll(function() use (&$transpher) {
     $transpher = AcceptanceCase::start_transpher('8091', $sender_key, []);
 });
 
-describe('blossom', function() {
+describe('blossom', function() use (&$transpher) {
     
 
-    it('is enabled and functional, simple GET request to an prewritten blob', function () {
-        $data_dir = AcceptanceCase::data_dir('8091');
+    it('is enabled and functional, simple GET request to an prewritten blob', function () use (&$transpher) {
+        $data_dir = $transpher->data_directory;
 
         $files_dir = $data_dir . '/files';
         is_dir($files_dir) || mkdir($files_dir);
@@ -21,18 +21,18 @@ describe('blossom', function() {
         expect($files_dir . '/' . $hash)->toBeFile();
         
         
-        list($protocol, $status, $headers, $body) = nostriphant\Blossom\request('GET', AcceptanceCase::relay_url('http://', '8091') . '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);
+        list($protocol, $status, $headers, $body) = nostriphant\Blossom\request('GET', $transpher->url . '/' . $hash, authorization: ['t' => 'get', 'x' => $hash]);
         expect($status)->toBe('200');
         expect($body)->toBe('Hello world!');
     });
     
-    it('uploads work', function () {
+    it('uploads work', function () use (&$transpher) {
         $resource = tmpfile();
         fwrite($resource, 'Hello World');
         fseek($resource, 0);
         
         $expected_hash = hash('sha256', 'Hello World');
-        $url = AcceptanceCase::relay_url('http://', '8091');
+        $url = $transpher->url;
         
         list($protocol, $status, $headers, $body) = nostriphant\Blossom\request('PUT', $url . '/upload', upload_resource:$resource, authorization: ['t' => 'get', 'x' => $expected_hash]);
         expect($status)->toBe('201', $headers['x-reason']?? $body);

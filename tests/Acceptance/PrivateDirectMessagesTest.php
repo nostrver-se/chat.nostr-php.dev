@@ -13,27 +13,27 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     $sender = Key::fromHex($sender_hex);
     $recipient = Key::fromHex($recipient_hex);
     
-    $cleanup = AcceptanceCase::start_transpher('8087', $recipient, null);
+    $transpher = AcceptanceCase::start_transpher('8087', $recipient, null);
     
     try {
         $alices_expected_messages = [];
-        $alice = Client::connectToUrl(AcceptanceCase::relay_url());
+        $alice = Client::connectToUrl($transpher->ws);
         $alice_log = AcceptanceCase::client_log('alice-8087', $recipient(Key::public()));
 
-        $bob = Client::connectToUrl(AcceptanceCase::relay_url());
+        $bob = Client::connectToUrl($transpher->ws);
         $bob_log = AcceptanceCase::client_log('bob-8087', $sender(Key::public()));
 
         expect($alice)->toBeCallable('Alice is not callable');
 
         $unwrapper = AcceptanceCase::unwrap($recipient);
 
-        $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $recipient) {
+        $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $recipient, $transpher) {
             $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 
             $subscriptionId = $subscription()[1];
             $send($subscription);
 
-            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
+            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws];
             $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
             $alices_expected_messages[] = ['EOSE', $subscriptionId];
 
@@ -48,7 +48,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
-        $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $cleanup->data_directory, $alice_log));
+        $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $transpher->data_directory, $alice_log));
 
         $bob_message = Factory::event($sender, 1, 'Hello!');
 
@@ -80,7 +80,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
         });
 
 
-        $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($cleanup->data_directory . '/transpher.sqlite'), []);
+        $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
         $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
         expect($notes_alice[0]->kind)->toBe(1);
@@ -96,11 +96,11 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect(file_get_contents(ROOT_DIR . '/logs/relay-6c0de3-output.log'))->not()->toContain('ERROR');
     } catch (\Exception $e) {
-        $cleanup();
+        $transpher();
         throw $e;
     }
     
-    $cleanup();
+    $transpher();
     
 })->with([
     ['a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3', '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']

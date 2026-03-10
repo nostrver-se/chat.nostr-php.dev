@@ -11,14 +11,16 @@ use nostriphant\NIP19\Bech32;
 abstract class AcceptanceCase extends BaseTestCase
 {   
     static function start_transpher(string $port, \nostriphant\NIP01\Key $owner, ?array $whitelisted_npubs) {
-        $data_dir = AcceptanceCase::data_dir($port);
+        $data_dir = ROOT_DIR . '/data/relay_' . $port;
+        is_dir($data_dir) || mkdir($data_dir);
+        
     
         (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
         expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
         
         $relay_env = [
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-            'RELAY_URL' => AcceptanceCase::relay_url(port:$port),
+            'RELAY_URL' => 'ws://127.0.0.1:' . $port,
             'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
             'RELAY_NAME' => 'Really relay',
             'RELAY_DESCRIPTION' => 'This is my dev relay',
@@ -34,12 +36,12 @@ abstract class AcceptanceCase extends BaseTestCase
             
         }
 
-        $relay = new Relay(AcceptanceCase::relay_url('tcp://', $port), $relay_env);
+        $relay = new Relay('tcp://127.0.0.1:' . $port, $relay_env);
         
         $agent = new Agent($port, [
             'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-            'RELAY_URL' => AcceptanceCase::relay_url(port: $port),
+            'RELAY_URL' => $relay_env['RELAY_URL'],
             'AGENT_LOG_LEVEL' => 'DEBUG',
         ]);
         
@@ -48,7 +50,7 @@ abstract class AcceptanceCase extends BaseTestCase
         $transpher = fn() => $relay() || $agent();
         
         
-        return new class($data_dir, AcceptanceCase::relay_url('http://', $port), AcceptanceCase::relay_url(port:$port), $transpher) {
+        return new class($relay_env['RELAY_DATA'], 'http://127.0.0.1:' . $port, $relay_env['RELAY_URL'], $transpher) {
             private \Closure $transpher;
             
             public function __construct(public string $data_directory, public string $url, public string $ws, callable $transpher) {
@@ -76,16 +78,6 @@ abstract class AcceptanceCase extends BaseTestCase
             expect($private_message)->toHaveKey('content');
             return $private_message->content;
         };
-    }
-    
-    static public function relay_url(string $scheme = 'ws://', string $port = '8087') {
-        return $scheme . '127.0.0.1:' . $port;
-    }
-
-    static function data_dir(?string $relay_id = null) {
-        $data_dir = ROOT_DIR . '/data/relay_' . ($relay_id ?? uniqid('', true));
-        is_dir($data_dir) || mkdir($data_dir);
-        return $data_dir;
     }
     
     static function client_log(string $client, string $pubkey) {
