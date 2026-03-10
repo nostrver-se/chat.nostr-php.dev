@@ -19,7 +19,7 @@ readonly class Transpher {
         $this->url = 'http://127.0.0.1:' . $port;
         $this->ws = 'ws://127.0.0.1:' . $port;
 
-        (is_file($this->data_directory . '/transpher.sqlite') === false) ||  unlink($this->data_directory . '/transpher.sqlite');
+        is_file($this->data_directory . '/transpher.sqlite') && unlink($this->data_directory . '/transpher.sqlite');
         expect($this->data_directory . '/transpher.sqlite')->not()->toBeFile();
 
         $relay_env = [

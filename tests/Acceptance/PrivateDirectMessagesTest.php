@@ -18,7 +18,6 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     
     try {
         $alice = Client::connectToUrl($transpher->ws);
-
         $bob = Client::connectToUrl($transpher->ws);
 
         expect($alice)->toBeCallable('Alice is not callable');
