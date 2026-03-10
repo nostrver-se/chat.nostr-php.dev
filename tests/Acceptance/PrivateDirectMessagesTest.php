@@ -49,32 +49,24 @@ it('starts relay and sends private direct messsage to relay owner', function (st
         $bob_message = Factory::event($sender, 1, 'Hello!');
 
         $bobs_expected_messages = [];
+        $bob_listener = new Listener('bob-8087', $sender);
 
         expect($bob)->toBeCallable('Bob is not callable');
 
-        $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
+        $bob_listen = $bob(function(callable $send) use ($bob_message, $bob_listener) {
             $send($bob_message);
-            $bobs_expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
+            Listener::expect($bob_listener, ['OK', $bob_message()[1]['id'], true, '']);
 
             $send(Message::req('sddf', ["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]));
-            $bobs_expected_messages[] = ['EOSE', 'sddf'];
+            Listener::expect($bob_listener, ['EOSE', 'sddf']);
         });
 
-        expect($bobs_expected_messages)->toHaveCount(2);
+        expect($bob_listener->expected_messages)->toHaveCount(2);
         expect($bob_listen)->toBeCallable('Bob listen is not callable');
 
-        $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
-            $expected_message = array_shift($bobs_expected_messages);
+        $bob_listen($bob_listener);
 
-            $type = array_shift($expected_message);
-            expect($message->type)->toBe($type, 'Message type checks out');
-            expect($message->payload)->toBe($expected_message);
-
-            if (count($bobs_expected_messages) === 0) {
-                $stop();
-            }
-        });
-
+        expect($bob_listener->expected_messages)->toHaveCount(0);
 
         $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
