@@ -17,14 +17,13 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     $transpher = new Transpher('8087', $recipient, null);
     
     try {
-        $alices_expected_messages = [];
         $alice = Client::connectToUrl($transpher->ws);
 
         $bob = Client::connectToUrl($transpher->ws);
 
         expect($alice)->toBeCallable('Alice is not callable');
 
-
+        $alice_listener = AcceptanceCase::createListener('alice-8087', $recipient, $alices_expected_messages);
         $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $recipient, $transpher) {
             $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 
@@ -46,7 +45,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
-        $alice_listen(AcceptanceCase::createListener('alice-8087', $recipient, $alices_expected_messages));
+        $alice_listen($alice_listener);
 
         $bob_message = Factory::event($sender, 1, 'Hello!');
 

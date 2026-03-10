@@ -17,16 +17,17 @@ describe('only events from whitelisted authors/recipients are stored', function 
         $transpher = new Transpher('8088', $recipient, []);
 
         try {
-            $alices_expected_messages = [];
             $alice = Client::connectToUrl($transpher->ws);
             $bob = Client::connectToUrl($transpher->ws);
             
-
             $subscriptionAlice = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 
             $bob_message = Factory::event($sender, 1, 'Hello!');
             $subscriptionAliceOnBobsMessage = Factory::subscribe(['ids' => [$bob_message()[1]['id']]]);
-            $bobs_expected_messages = [['OK', $bob_message()[1]['id'], true, '']];
+            
+            $alice_listener = AcceptanceCase::createListener('alice-8088', $recipient, $alices_expected_messages);
+            $bob_listener = AcceptanceCase::createListener('bob-8088', $sender, $bobs_expected_messages);
+            $bobs_expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
             
             $bob_listen;
             $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $subscriptionAlice, $subscriptionAliceOnBobsMessage, $bob, $bob_message, &$bob_listen, $recipient, $transpher) {
@@ -60,8 +61,8 @@ describe('only events from whitelisted authors/recipients are stored', function 
 
             expect($bobs_expected_messages)->toHaveCount(1);
             
-            $alice_listen(AcceptanceCase::createListener('alice-8088', $recipient, $alices_expected_messages));
-            $bob_listen(AcceptanceCase::createListener('bob-8088', $sender, $bobs_expected_messages));
+            $alice_listen($alice_listener);
+            $bob_listen($bob_listener);
 
             $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
@@ -89,12 +90,11 @@ describe('only events from whitelisted authors/recipients are stored', function 
         $transpher = new Transpher('8090', $recipient, [(string) Bech32::npub($sender(Key::public()))]);
 
         try {
-            $alices_expected_messages = [];
             $alice = Client::connectToUrl($transpher->ws);
             $bob = Client::connectToUrl($transpher->ws);
             
 
-
+            $alice_listener = AcceptanceCase::createListener('alice-8090', $recipient, $alices_expected_messages);
             $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $recipient, $transpher) {
                 $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 
@@ -114,7 +114,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
                 $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
             });
 
-            $alice_listen(AcceptanceCase::createListener('alice-8090', $recipient, $alices_expected_messages));
+            $alice_listen($alice_listener);
 
 
             $bob_message = Factory::event($sender, 1, 'Hello!');

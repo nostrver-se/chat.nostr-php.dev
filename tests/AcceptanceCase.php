@@ -6,7 +6,9 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class AcceptanceCase extends BaseTestCase
 {
-    static function createListener(string $client, \nostriphant\NIP01\Key $recipient, array &$alices_expected_messages) {
+    static function createListener(string $client, \nostriphant\NIP01\Key $recipient, ?array &$alices_expected_messages) {
+        $alices_expected_messages = [];
+        
         $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
         $logger = fn(string $message) => fwrite($handle, $message . PHP_EOL);
 
