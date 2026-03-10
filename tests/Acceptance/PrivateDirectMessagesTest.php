@@ -13,39 +13,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     $sender = Key::fromHex($sender_hex);
     $recipient = Key::fromHex($recipient_hex);
     
-    $data_dir = AcceptanceCase::data_dir('8087');
-    (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
-    expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
-    
-    $relay = new nostriphant\TranspherTests\Relay(AcceptanceCase::relay_url('tcp://'), [
-        'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-        'RELAY_URL' => AcceptanceCase::relay_url(port:'8087'),
-        'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
-        'RELAY_NAME' => 'Really relay',
-        'RELAY_DESCRIPTION' => 'This is my dev relay',
-        'RELAY_CONTACT' => 'transpher@nostriphant.dev',
-        'RELAY_DATA' => $data_dir,
-        'RELAY_LOG_LEVEL' => 'DEBUG',
-        'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
-        'BLOSSOM_SERVER_KEY' => 'ae89403ee4f95cac13c9984f588ad92cee48c202f52c6f96d4d5c053d8332c85',
-    ]);
-    
-    expect($relay)->toBeCallable('Relay is not callable');
-    
-    $agent = new nostriphant\TranspherTests\Agent(8087, [
-        'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
-        'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-        'RELAY_URL' => AcceptanceCase::relay_url(),
-        'AGENT_LOG_LEVEL' => 'DEBUG',
-    ]);
-    expect($agent)->toBeCallable('Agent is not callable');
-    
-    sleep(3);
-
-    $cleanup = function() use ($agent, $relay) {
-        $agent();
-        $relay();
-    };
+    $cleanup = AcceptanceCase::start_transpher('8087', $recipient, null);
     
     try {
         $alices_expected_messages = [];
@@ -80,7 +48,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
-        $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $data_dir, $alice_log));
+        $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $cleanup->data_directory, $alice_log));
 
         $bob_message = Factory::event($sender, 1, 'Hello!');
 
@@ -112,7 +80,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
         });
 
 
-        $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
+        $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($cleanup->data_directory . '/transpher.sqlite'), []);
 
         $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
         expect($notes_alice[0]->kind)->toBe(1);
