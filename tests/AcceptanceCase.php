@@ -53,7 +53,7 @@ abstract class AcceptanceCase extends BaseTestCase
                     'RELAY_URL' => $relay_env['RELAY_URL'],
                     'AGENT_LOG_LEVEL' => 'DEBUG',
                 ]);
-                sleep(4);
+                sleep(1);
             }
             
             public function __invoke() {
