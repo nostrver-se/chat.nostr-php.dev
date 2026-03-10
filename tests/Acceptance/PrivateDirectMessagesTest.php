@@ -22,16 +22,16 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect($alice)->toBeCallable('Alice is not callable');
 
-        $alice_listener = AcceptanceCase::createListener('alice-8087', $recipient, $alices_expected_messages);
-        $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $recipient, $transpher) {
+        $alice_listener = AcceptanceCase::createListener('alice-8087', $recipient);
+        $alice_listen = $alice(function(callable $send) use ($alice_listener, $recipient, $transpher) {
             $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
 
             $subscriptionId = $subscription()[1];
             $send($subscription);
 
-            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws];
-            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
-            $alices_expected_messages[] = ['EOSE', $subscriptionId];
+            $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws];
+            $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
+            $alice_listener->expected_messages[] = ['EOSE', $subscriptionId];
 
             $request = $subscription();
             expect($request[2])->toBeArray();
@@ -39,7 +39,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
             $signed_message = Factory::event($recipient, 1, 'Hello!');
             $send($signed_message);
-            $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
+            $alice_listener->expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
         });
 
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
