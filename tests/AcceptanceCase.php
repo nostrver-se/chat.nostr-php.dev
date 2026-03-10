@@ -24,20 +24,17 @@ abstract class AcceptanceCase extends BaseTestCase
     }
     
     static function client_log(string $client, string $pubkey) {
-        $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
-        $log = fn(string $message) => fwrite($handle, $message . PHP_EOL);
-
-        $log('>>> Starting log for client ' . $client . ' ('.$pubkey.')');
-
-        return $log;
     }
     
     static function createListener(string $client, \nostriphant\NIP01\Key $recipient, array &$alices_expected_messages, string $data_dir) {
         $unwrapper = AcceptanceCase::unwrap($recipient);
-        $alice_log = AcceptanceCase::client_log($client, $recipient(\nostriphant\NIP01\Key::public()));
         
-        return function (\nostriphant\NIP01\Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir, $alice_log) {
-            $message_log = fn(string $log_message) => $alice_log(substr(sha1($message), 0, 6) . ' - ' . $log_message);
+        $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
+        $logger = fn(string $message) => fwrite($handle, $message . PHP_EOL);
+
+        $logger('>>> Starting log for client ' . $client . ' ('.$recipient(\nostriphant\NIP01\Key::public()).')');
+        return function (\nostriphant\NIP01\Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir, $logger) {
+            $message_log = fn(string $log_message) => $logger(substr(sha1($message), 0, 6) . ' - ' . $log_message);
             
             $message_log('Received ' . $message);
 
@@ -84,8 +81,8 @@ abstract class AcceptanceCase extends BaseTestCase
             }
 
             $alices_expected_messages = $remaining;
-            $alice_log('Expected messages remaining ' . count($alices_expected_messages));
-            $alice_log(var_export($alices_expected_messages, true));
+            $logger('Expected messages remaining ' . count($alices_expected_messages));
+            $logger(var_export($alices_expected_messages, true));
             if (count($alices_expected_messages) === 0) {
                 $stop();
             }
