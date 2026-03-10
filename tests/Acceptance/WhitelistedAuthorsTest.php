@@ -33,15 +33,15 @@ describe('only events from whitelisted authors/recipients are stored', function 
             $alice_listen = $alice(function(callable $send) use ($alice_listener, $subscriptionAlice, $subscriptionAliceOnBobsMessage, $bob, $bob_message, &$bob_listen, $recipient, $transpher) {
 
                 $send($subscriptionAliceOnBobsMessage);
-                $alice_listener->expected_messages[] = ['EVENT', $subscriptionAliceOnBobsMessage()[1], 'Hello!'];
-                $alice_listener->expected_messages[] = ['EOSE', $subscriptionAliceOnBobsMessage()[1]];
+                Listener::expect($alice_listener, ['EVENT', $subscriptionAliceOnBobsMessage()[1], 'Hello!']);
+                Listener::expect($alice_listener, ['EOSE', $subscriptionAliceOnBobsMessage()[1]]);
                 
                 $subscriptionId = $subscriptionAlice()[1];
                 $send($subscriptionAlice);
 
-                $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws];
-                $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
-                $alice_listener->expected_messages[] = ['EOSE', $subscriptionId];
+                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws]);
+                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036']);
+                Listener::expect($alice_listener, ['EOSE', $subscriptionId]);
 
                 $request = $subscriptionAlice();
                 expect($request[2])->toBeArray();
@@ -50,7 +50,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
                 $signed_message = Factory::event($recipient, 1, 'Hello!');
                 $send($signed_message);
                 
-                $alice_listener->expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
+                Listener::expect($alice_listener, ['OK', $signed_message()[1]['id'], true, ""]);
                 
                 sleep(1);
                 
@@ -101,9 +101,9 @@ describe('only events from whitelisted authors/recipients are stored', function 
                 $subscriptionId = $subscription()[1];
                 $send($subscription);
 
-                $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws];
-                $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
-                $alice_listener->expected_messages[] = ['EOSE', $subscriptionId];
+                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws]);
+                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036']);
+                Listener::expect($alice_listener, ['EOSE', $subscriptionId]);
 
                 $request = $subscription();
                 expect($request[2])->toBeArray();
@@ -111,7 +111,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
 
                 $signed_message = Factory::event($recipient, 1, 'Hello!');
                 $send($signed_message);
-                $alice_listener->expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
+                Listener::expect($alice_listener, ['OK', $signed_message()[1]['id'], true, ""]);
             });
 
             $alice_listen($alice_listener);

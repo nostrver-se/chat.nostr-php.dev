@@ -12,6 +12,10 @@ class Listener {
 
         ($this->logger)('>>> Starting log for client ' . $client . ' (' . ($this->recipient)(\nostriphant\NIP01\Key::public()) . ')');
     }
+    
+    static function expect(self $listener, array $message) : void {
+        $listener->expected_messages[] = $message;
+    }
 
     public function __invoke(\nostriphant\NIP01\Message $message, callable $stop) {
         $message_log = fn(string $log_message) => ($this->logger)(substr(sha1($message), 0, 6) . ' - ' . $log_message);

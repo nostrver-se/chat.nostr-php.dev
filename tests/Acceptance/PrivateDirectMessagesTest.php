@@ -29,9 +29,9 @@ it('starts relay and sends private direct messsage to relay owner', function (st
             $subscriptionId = $subscription()[1];
             $send($subscription);
 
-            $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws];
-            $alice_listener->expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
-            $alice_listener->expected_messages[] = ['EOSE', $subscriptionId];
+            Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws]);
+            Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036']);
+            Listener::expect($alice_listener, ['EOSE', $subscriptionId]);
 
             $request = $subscription();
             expect($request[2])->toBeArray();
@@ -39,7 +39,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
             $signed_message = Factory::event($recipient, 1, 'Hello!');
             $send($signed_message);
-            $alice_listener->expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
+            Listener::expect($alice_listener, ['OK', $signed_message()[1]['id'], true, ""]);
         });
 
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
