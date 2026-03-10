@@ -32,7 +32,10 @@ abstract class AcceptanceCase extends BaseTestCase
         return $log;
     }
     
-    static function createListener(callable $unwrapper, array &$alices_expected_messages, string $data_dir, callable $alice_log) {
+    static function createListener(string $client, \nostriphant\NIP01\Key $recipient, array &$alices_expected_messages, string $data_dir) {
+        $unwrapper = AcceptanceCase::unwrap($recipient);
+        $alice_log = AcceptanceCase::client_log($client, $recipient(\nostriphant\NIP01\Key::public()));
+        
         return function (\nostriphant\NIP01\Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir, $alice_log) {
             $message_log = fn(string $log_message) => $alice_log(substr(sha1($message), 0, 6) . ' - ' . $log_message);
             
