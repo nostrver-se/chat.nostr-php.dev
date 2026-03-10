@@ -10,13 +10,13 @@ use nostriphant\NIP19\Bech32;
 
 abstract class AcceptanceCase extends BaseTestCase
 {   
-    static function start_transpher(string $port, \nostriphant\NIP01\Key $owner, array $whitelisted_npubs) {
+    static function start_transpher(string $port, \nostriphant\NIP01\Key $owner, ?array $whitelisted_npubs) {
         $data_dir = AcceptanceCase::data_dir($port);
     
         (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
         expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
-
-        $relay = new Relay(AcceptanceCase::relay_url('tcp://', $port), [
+        
+        $relay_env = [
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => AcceptanceCase::relay_url(port:$port),
             'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
@@ -25,11 +25,16 @@ abstract class AcceptanceCase extends BaseTestCase
             'RELAY_CONTACT' => 'transpher@nostriphant.dev',
             'RELAY_DATA' => $data_dir,
             'RELAY_LOG_LEVEL' => 'DEBUG',
-            'RELAY_WHITELISTED_AUTHORS_ONLY' => 1,
-            'RELAY_WHITELISTED_AUTHORS' => implode(',', $whitelisted_npubs),
             'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
             'BLOSSOM_SERVER_KEY' => 'ae89403ee4f95cac13c9984f588ad92cee48c202f52c6f96d4d5c053d8332c85',
-        ]);
+        ];
+        if (isset($whitelisted_npubs)) {
+            $relay_env['RELAY_WHITELISTED_AUTHORS_ONLY'] = 1;
+            $relay_env['RELAY_WHITELISTED_AUTHORS'] = implode(',', $whitelisted_npubs);
+            
+        }
+
+        $relay = new Relay(AcceptanceCase::relay_url('tcp://', $port), $relay_env);
         
         $agent = new Agent($port, [
             'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),

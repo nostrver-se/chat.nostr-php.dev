@@ -19,7 +19,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     
     $relay = new nostriphant\TranspherTests\Relay(AcceptanceCase::relay_url('tcp://'), [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-        'RELAY_URL' => AcceptanceCase::relay_url(),
+        'RELAY_URL' => AcceptanceCase::relay_url(port:'8087'),
         'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
