@@ -3,6 +3,7 @@
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 use nostriphant\TranspherTests\AcceptanceCase;
+use nostriphant\TranspherTests\Transpher;
 use nostriphant\TranspherTests\Factory;
 
 use nostriphant\Client\Client;
@@ -13,7 +14,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
         $sender = Key::fromHex($sender_hex);
         $recipient = Key::fromHex($recipient_hex);
         
-        $transpher = AcceptanceCase::start_transpher('8088', $recipient, []);
+        $transpher = new Transpher('8088', $recipient, []);
 
         try {
             $alices_expected_messages = [];
@@ -88,7 +89,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
         $sender = Key::fromHex($sender_hex);
         $recipient = Key::fromHex($recipient_hex);
         
-        $transpher = AcceptanceCase::start_transpher('8090', $recipient, [(string) Bech32::npub($sender(Key::public()))]);
+        $transpher = new Transpher('8090', $recipient, [(string) Bech32::npub($sender(Key::public()))]);
 
         try {
             $alices_expected_messages = [];

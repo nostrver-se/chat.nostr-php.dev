@@ -1,11 +1,11 @@
 <?php
 
-use nostriphant\TranspherTests\AcceptanceCase;
+use nostriphant\TranspherTests\Transpher;
 
 $transpher;
 beforeAll(function() use (&$transpher) {
     $sender_key = nostriphant\NIP01\Key::fromHex('a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
-    $transpher = AcceptanceCase::start_transpher('8091', $sender_key, []);
+    $transpher = new Transpher('8091', $sender_key, []);
 });
 
 describe('blossom', function() use (&$transpher) {

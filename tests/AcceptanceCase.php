@@ -6,10 +6,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class AcceptanceCase extends BaseTestCase
 {   
-    static function start_transpher(string $port, \nostriphant\NIP01\Key $owner, ?array $whitelisted_npubs) {
-        return new Transpher($port, $owner, $whitelisted_npubs);
-    }
-    
     static public function unwrap(\nostriphant\NIP01\Key $recipient_key) {
         return function(array $gift) use ($recipient_key) {
             expect($gift['kind'])->toBe(1059);

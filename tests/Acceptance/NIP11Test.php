@@ -2,13 +2,13 @@
 
 namespace nostriphant\RelayTests\Feature;
 
-use nostriphant\TranspherTests\AcceptanceCase;
 use nostriphant\NIP01\Key;
+use nostriphant\TranspherTests\Transpher;
 
 it('boots a relay instance, which responds with an NIP-11 information document on a "GET /" request', function() {
     $recipient = Key::fromHex('6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc');
     
-    $transpher = AcceptanceCase::start_transpher('8092', $recipient, []);
+    $transpher = new Transpher('8092', $recipient, []);
     expect($transpher->url)->toStartWith('http://');
     
     list($protocol, $status, $headers, $body) = \nostriphant\Blossom\request('GET', $transpher->url . '/', headers: ['Accept: application/nostr+json']);
@@ -30,7 +30,7 @@ it('boots a relay instance, which responds with an NIP-11 information document o
 it('reproduce nostria 504 error on information document request', function() {
     $recipient = Key::fromHex('6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc');
 
-    $transpher = AcceptanceCase::start_transpher('8093', $recipient, []);
+    $transpher = new Transpher('8093', $recipient, []);
     
     list($protocol, $status, $headers, $body) = \nostriphant\Blossom\request('GET', $transpher->url, headers: [
         'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0',

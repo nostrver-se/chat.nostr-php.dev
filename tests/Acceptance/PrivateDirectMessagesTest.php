@@ -3,6 +3,7 @@
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 use nostriphant\TranspherTests\AcceptanceCase;
+use nostriphant\TranspherTests\Transpher;
 use nostriphant\TranspherTests\Factory;
 
 use nostriphant\Client\Client;
@@ -13,7 +14,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
     $sender = Key::fromHex($sender_hex);
     $recipient = Key::fromHex($recipient_hex);
     
-    $transpher = AcceptanceCase::start_transpher('8087', $recipient, null);
+    $transpher = new Transpher('8087', $recipient, null);
     
     try {
         $alices_expected_messages = [];
