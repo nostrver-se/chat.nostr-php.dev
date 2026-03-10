@@ -46,7 +46,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
-        $alice_listen(AcceptanceCase::createListener('alice-8087', $recipient, $alices_expected_messages, $transpher->data_directory));
+        $alice_listen(AcceptanceCase::createListener('alice-8087', $recipient, $alices_expected_messages));
 
         $bob_message = Factory::event($sender, 1, 'Hello!');
 

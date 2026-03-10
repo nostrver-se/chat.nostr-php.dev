@@ -60,8 +60,8 @@ describe('only events from whitelisted authors/recipients are stored', function 
 
             expect($bobs_expected_messages)->toHaveCount(1);
             
-            $alice_listen(AcceptanceCase::createListener('alice-8088', $recipient, $alices_expected_messages, $transpher->data_directory));
-            $bob_listen(AcceptanceCase::createListener('bob-8088', $sender, $bobs_expected_messages, $transpher->data_directory));
+            $alice_listen(AcceptanceCase::createListener('alice-8088', $recipient, $alices_expected_messages));
+            $bob_listen(AcceptanceCase::createListener('bob-8088', $sender, $bobs_expected_messages));
 
             $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
@@ -114,7 +114,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
                 $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
             });
 
-            $alice_listen(AcceptanceCase::createListener('alice-8090', $recipient, $alices_expected_messages, $transpher->data_directory));
+            $alice_listen(AcceptanceCase::createListener('alice-8090', $recipient, $alices_expected_messages));
 
 
             $bob_message = Factory::event($sender, 1, 'Hello!');

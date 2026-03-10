@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class AcceptanceCase extends BaseTestCase
 {
-    static function createListener(string $client, \nostriphant\NIP01\Key $recipient, array &$alices_expected_messages, string $data_dir) {
+    static function createListener(string $client, \nostriphant\NIP01\Key $recipient, array &$alices_expected_messages) {
         $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
         $logger = fn(string $message) => fwrite($handle, $message . PHP_EOL);
 
         $logger('>>> Starting log for client ' . $client . ' ('.$recipient(\nostriphant\NIP01\Key::public()).')');
-        return function (\nostriphant\NIP01\Message $message, callable $stop) use ($recipient, &$alices_expected_messages, $data_dir, $logger) {
+        return function (\nostriphant\NIP01\Message $message, callable $stop) use ($recipient, &$alices_expected_messages, $logger) {
             $message_log = fn(string $log_message) => $logger(substr(sha1($message), 0, 6) . ' - ' . $log_message);
             
             $message_log('Received ' . $message);
